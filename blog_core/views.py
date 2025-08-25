@@ -6,6 +6,7 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticatedOrReadOnly,IsAdminUser,IsAuthenticated
 from .permission import IsOwnerOrReadOnly,IsAdminorOwner
 from .pagination import BlogPagination
+from django.db.models import Q
 
 
 class CategoryListCreateView(generics.ListCreateAPIView):
@@ -31,9 +32,18 @@ class CategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class PostListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
-    queryset = Post.objects.filter(status='published')
+    # queryset = Post.objects.filter(status='published')
     serializer_class = PostSerializer
     pagination_class = BlogPagination
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated:
+            return Post.objects.filter(
+                Q(status='published') | Q(author=user, status='draft')
+            )
+        else:
+            return Post.objects.filter(status='published')
 
 class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsOwnerOrReadOnly,IsAdminUser]

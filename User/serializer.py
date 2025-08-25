@@ -67,6 +67,9 @@ class UserPasswordUpdateSerializer(serializers.Serializer):
         return value
     
     def validate(self, attrs):
+        if attrs["old_password"] == attrs["new_password"]:
+            raise serializers.ValidationError("Password Cannot be same")
+        
         if attrs["new_password"] != attrs["confirm_password"]:
             raise serializers.ValidationError("Password Doesnot Match")
         
