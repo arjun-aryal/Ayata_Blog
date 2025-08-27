@@ -7,24 +7,26 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ['id', 'post', 'author_name', 'content', 'created_at']
-        read_only_fields = ["id"]
+        read_only_fields = ["id","post"]
 
 
 class PostSerializer(serializers.ModelSerializer):
-#    comments = CommentSerializer(many=True, read_only=True)
+    comments = CommentSerializer(many=True, read_only=True)
     author_name = serializers.CharField(source='author.name', read_only=True)
     category_name = serializers.CharField(source='category.name', read_only=True)
 
     class Meta:
         model = Post
-        fields = ['id', 'category', 'category_name', 'title', 'content', 'author_name', 'status', 'created_at', 'updated_at'] #, 'comments'
+        fields = ['id', 'category', 'category_name', 'title', 'content', 'author_name', 'status', 'created_at', 'updated_at', 'comments']
         read_only_fields = ["id"]
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    posts = PostSerializer(many=True, read_only=True)
+    # posts = PostSerializer(many=True, read_only=True)
 
     class Meta:
         model = Category
-        fields = ['id', 'name', 'slug', 'description', 'posts']
+        fields = ['id', 'name', 'slug', 'description']
         read_only_fields = ["id"]
+
+        
